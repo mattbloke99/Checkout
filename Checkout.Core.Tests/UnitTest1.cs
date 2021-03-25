@@ -28,6 +28,18 @@ namespace Checkout.Core.Tests
             Assert.Equal(130, entryCost);
         }
 
+        [Fact]
+        public void CalculatePriceForSingleEntryWhenSpecialPriceAndNormalPriceApplyTest()
+        {
+            var specialPrice = new SpecialPrice() { SpecialPriceName = "3 for 130", Quantity = 3, Cost = 130 };
+            var sku = new Sku() { Name = "A", Cost = 50, SpecialPrice = specialPrice };
+            var entry = new EntryItem() { Quantity = 5, Sku = sku };
+
+            int entryCost = entry.CalculateCost();
+
+            Assert.Equal(230, entryCost);
+        }
+
 
     }
 
@@ -54,9 +66,22 @@ namespace Checkout.Core.Tests
                 return Quantity * Sku.Cost;
             } else
             {
-                int quantityitemsAtSpecialPrice = Quantity / Sku.SpecialPrice.Quantity;
-                return quantityitemsAtSpecialPrice * Sku.SpecialPrice.Cost;
+                return CostOfItemsAtNormalPrice() + CostOfItemsAtSpecialPrice();
             }
+        }
+
+        private int CostOfItemsAtNormalPrice()
+        {
+            int quantityItemsAtNormalPrice = Quantity % Sku.SpecialPrice.Quantity;
+            var cost = quantityItemsAtNormalPrice * Sku.Cost;
+            return cost;
+        }
+
+        private int CostOfItemsAtSpecialPrice()
+        {
+            int quantityitemsAtSpecialPrice = Quantity / Sku.SpecialPrice.Quantity;
+            var cost = quantityitemsAtSpecialPrice * Sku.SpecialPrice.Cost;
+            return cost;
         }
     }
 
