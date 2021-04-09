@@ -8,11 +8,9 @@
 
         public SpecialPrice SpecialPrice { get; set; }
 
-        private int CostOfItemsAtNormalPrice(int quantity)
-        {
-            int quantityItemsAtNormalPrice = quantity % SpecialPrice.Quantity;
-            return quantityItemsAtNormalPrice * UnitPrice;
-        }
+        private int QuantityOfItemsAtNormalPrice(int quantity) => SpecialPrice == null ? quantity : quantity % SpecialPrice.Quantity;
+
+        private int CostOfItemsAtNormalPrice(int quantity) => QuantityOfItemsAtNormalPrice(quantity) * UnitPrice;
 
         private int CostOfItemsAtSpecialPrice(int quantity)
         {
@@ -22,12 +20,9 @@
 
         public int CalculatePrice(int quantity)
         {
-            if (SpecialPrice == null) {
-                return quantity * UnitPrice;
-            } else
-            {
-                return this.CostOfItemsAtNormalPrice(quantity) + CostOfItemsAtSpecialPrice(quantity);
-            }
+
+            int specialPrice = SpecialPrice == null ? 0 : CostOfItemsAtSpecialPrice(quantity);
+            return specialPrice + CostOfItemsAtNormalPrice(QuantityOfItemsAtNormalPrice(quantity));
         }
     }
 }
